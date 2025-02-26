@@ -1,0 +1,20 @@
+
+development:
+  adapter: mysql2
+  database: <%= ENV.fetch("MYSQL_DATABASE_PREFIX") %>_development
+  encoding: utf8mb4
+  host: <%= ENV.fetch("MYSQL_CONTAINER_HOST") %>
+  password: <%= ENV.fetch("MYSQL_PASSWORD") %>
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  port: <%= ENV.fetch("MYSQL_CONTAINER_PORT") %>
+  username: <%= ENV.fetch("MYSQL_USER") %>
+
+test:
+  adapter: mysql2
+  database: <%= ENV.fetch("MYSQL_DATABASE_PREFIX") %>_test
+  encoding: utf8mb4
+  host: <%= ENV.fetch("MYSQL_CONTAINER_HOST") %>
+  password: <%= ENV.fetch("MYSQL_PASSWORD") %>
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  port: <%= ENV.fetch("MYSQL_CONTAINER_PORT") %>
+  username: <%= ENV.fetch("MYSQL_USER") %>

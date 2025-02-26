@@ -1,0 +1,9 @@
+development:
+  adapter: redis
+  channel_prefix: <%= ENV.fetch("ACTION_CABLE_CHANNEL_PREFIX") + "_development" %>
+  url: <%= ENV.fetch("REDIS_URL") %>
+
+test:
+  adapter: redis
+  channel_prefix: <%= ENV.fetch("ACTION_CABLE_CHANNEL_PREFIX") + "_test" %>
+  url: <%= ENV.fetch("REDIS_URL") %>

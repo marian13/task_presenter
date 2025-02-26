@@ -1,0 +1,111 @@
+version: '3'
+
+tasks:
+  ##
+  # Usage examples:
+  #   task docker:bash
+  #
+  docker:bash:
+    cmds:
+      - docker compose -f docker/development/docker-compose.yml run --rm rails bash
+    interactive: true
+
+  docker:build:
+    cmds:
+      - docker compose -f docker/development/docker-compose.yml build
+
+  docker:chrome:
+    cmds:
+      - docker compose -f docker/development/docker-compose.yml up --remove-orphans chrome
+
+  docker:chrome:vnc:
+    cmds:
+      - open vnc://localhost:5900
+
+  docker:lint:
+    cmds:
+      - |
+        docker compose \
+          -f docker/development/docker-compose.yml \
+          run \
+          --rm \
+          rails \
+          bash -c 'yarn run standard --fix && bundle exec standardrb --fix'
+
+  ##
+  # Usage examples:
+  #   task docker:rails:console
+  #
+  docker:rails:console:
+    cmds:
+      - |
+        docker compose \
+          -f docker/development/docker-compose.yml \
+          run \
+          --rm \
+          rails \
+          bash -c 'bundle exec rails console'
+    interactive: true
+
+  ##
+  # Usage examples:
+  #   task docker:rails:server
+  #
+  docker:rails:server:
+    cmds:
+      - |
+        docker compose \
+          -f docker/development/docker-compose.yml \
+          run \
+          --rm \
+          --publish {{.RAILS_HOST_PORT}}:{{.RAILS_CONTAINER_PORT}} \
+          rails \
+          bash -c '
+            bundle exec rails db:create \
+              && bundle exec rails db:migrate \
+              && bundle exec rails db:seed \
+              && (yarn build --watch=forever &) \
+              && bundle exec rails server --port {{.RAILS_CONTAINER_PORT}} -b 0.0.0.0
+          '
+    interactive: true
+    vars:
+      RAILS_HOST_PORT: '{{.RAILS_HOST_PORT| default "3000"}}'
+      RAILS_CONTAINER_PORT: '{{.RAILS_CONTAINER_PORT| default "3000"}}'
+
+  ##
+  # Usage examples:
+  #   task docker:sidekiq
+  #
+  docker:sidekiq:
+    cmds:
+      - |
+        docker compose \
+          -f docker/development/docker-compose.yml \
+          run \
+          --rm \
+          rails \
+          bash -c 'bundle exec sidekiq'
+    interactive: true
+
+  ##
+  # Usage examples:
+  #   task docker:turnip
+  #
+  docker:turnip:
+    cmds:
+      - |
+        docker compose \
+          -f docker/development/docker-compose.yml \
+          run \
+          --rm \
+          --publish {{.TURNIP_RAILS_HOST_PORT}}:{{.TURNIP_RAILS_CONTAINER_PORT}} \
+          rails \
+          bash -c ' \
+            RAILS_ENV=test bundle exec rails assets:precompile \
+            && TURNIP_DELAY={{.TURNIP_DELAY}} bundle exec rspec --require turnip/rspec spec/features
+          '
+    interactive: true
+    vars:
+      TURNIP_DELAY: '{{.TURNIP_DELAY| default "0"}}'
+      TURNIP_RAILS_HOST_PORT: '{{.TURNIP_RAILS_HOST_PORT| default "4000"}}'
+      TURNIP_RAILS_CONTAINER_PORT: '{{.TURNIP_RAILS_CONTAINER_PORT| default "4000"}}'
