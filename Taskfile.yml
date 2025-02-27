@@ -61,7 +61,9 @@ tasks:
           --publish {{.RAILS_HOST_PORT}}:{{.RAILS_CONTAINER_PORT}} \
           rails \
           bash -c '
-            bundle exec rails db:create \
+            bundle install \
+              && yarn install \
+              && bundle exec rails db:create \
               && bundle exec rails db:migrate \
               && bundle exec rails db:seed \
               && (yarn build --watch=forever &) \
